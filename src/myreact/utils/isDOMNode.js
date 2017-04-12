@@ -1,0 +1,1 @@
+export default n => typeof n.type === 'string';

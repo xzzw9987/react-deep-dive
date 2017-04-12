@@ -1,0 +1,1 @@
+export const REAL_DOM_KEY = '__realDOM';

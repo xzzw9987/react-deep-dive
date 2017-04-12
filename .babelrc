@@ -1,0 +1,17 @@
+{
+  "presets": [
+    [
+      "es2015",
+      {
+        "loose": true,
+        "modules": false
+      }
+    ],
+    "react"
+  ],
+  "plugins": [
+    "transform-runtime",
+    "transform-async-to-generator",
+    "transform-object-rest-spread"
+  ]
+}
