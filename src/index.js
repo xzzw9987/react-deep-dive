@@ -10,7 +10,6 @@ import {render} from 'react-dom';
 class Form extends Component {
     getChildContext = () => {
         const _this = this;
-        console.log(_this);
         return {
             registerValidateMethod(validateMethod){
                 if (!_this.validateMethodsList)
@@ -75,7 +74,8 @@ function withValidMethod(component, validateMethods) {
     return class extends Component {
         state = {
             error: false,
-            value: ''
+            value: '',
+            errorMessage: ''
         };
 
         static contextTypes = {
@@ -83,15 +83,16 @@ function withValidMethod(component, validateMethods) {
         };
 
         valid = value => {
+            let errorMessage = '';
             const result = validateMethods.reduce((result, test) => {
                 // @todo
                 // test.message
                 if (!test.method(value)) {
-                    console.log(test.message);
+                    errorMessage = `${errorMessage} ${test.message}` ;
                 }
                 return result && test.method(value);
             }, true);
-            this.setState({error: !result});
+            this.setState({error: !result, errorMessage});
             return result;
         };
 
@@ -103,7 +104,7 @@ function withValidMethod(component, validateMethods) {
         };
         onFocus = e => {
             this.props.onFocus && this.props.onFocus(e);
-            this.setState({error: false});
+            this.setState({error: false, errorMessage: ''});
         };
         onChange = e => {
             this.props.onChange && this.props.onChange(e);
@@ -119,15 +120,16 @@ function withValidMethod(component, validateMethods) {
             this.unRegis && this.unRegis();
         }
 
-
         render() {
             let Component = component;
-            return <Component
+            return (<div><Component
                 {...this.props}
                 error={this.state.error}
                 onFocus={this.onFocus}
                 onBlur={this.onBlur}
                 onChange={this.onChange}/>
+                <span>{ this.state.errorMessage }</span>
+            </div>);
         }
     }
 }
