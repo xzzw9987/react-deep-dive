@@ -9,12 +9,11 @@ import {render} from 'react-dom';
 
 class Form extends Component {
     getChildContext = () => {
-        const _this = this;
         return {
-            registerValidateMethod(validateMethod){
-                if (!_this.validateMethodsList)
-                    _this.validateMethodsList = [];
-                const {validateMethodsList} = _this;
+            registerValidateMethod: validateMethod => {
+                if (!this.validateMethodsList)
+                    this.validateMethodsList = [];
+                const {validateMethodsList} = this;
                 validateMethodsList.push(validateMethod);
                 return () => {
                     const idx = validateMethodsList.indexOf(validateMethod);
@@ -88,7 +87,7 @@ function withValidMethod(component, validateMethods) {
                 // @todo
                 // test.message
                 if (!test.method(value)) {
-                    errorMessage = `${errorMessage} ${test.message}` ;
+                    errorMessage = `${errorMessage} ${test.message}`;
                 }
                 return result && test.method(value);
             }, true);
