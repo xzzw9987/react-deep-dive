@@ -9,6 +9,7 @@ import {REAL_DOM_KEY} from './key';
 import setAttributes from './utils/setAttributes';
 import Component from './component';
 import getDOMComponent from './domComponent';
+
 /**
  * Mount an element to DOM .
  * @param element
@@ -45,8 +46,8 @@ const mountNativeElement = (element, dom) => {
      */
 
 
-    const C = getDOMComponent(type),
-        c = new C(props),
+    const Ctor = getDOMComponent(type),
+        c = new Ctor(props),
         r = c.render();
 
     Object.assign(r, {
@@ -57,9 +58,8 @@ const mountNativeElement = (element, dom) => {
         __containerDOM: getRealDOM(dom),
         __lastRender: r
     });
-
     Object.assign(element, {
-        __renderedComponent:c,
+        __renderedComponent: c,
         __containerDOM: getRealDOM(dom),
         __renderDOM: domElement
     });
@@ -100,18 +100,20 @@ const mountCustomElement = (element, dom) => {
     walkEachNode(renderedElement, element => element.ref && (component.refs[element.ref] = element));
 
     const [mounted, renderedComponent] = mount(renderedElement, dom);
-    console.log('------', renderedComponent);
     Object.defineProperties(element, {
         __renderedComponent: {
-            value: component
+            value: component,
+            configurable: true
         },
         __containerDOM: {
-            value: getRealDOM(dom)
+            value: getRealDOM(dom),
+            configurable: true
         },
         __renderDOM: {
             get(){
                 return mounted.__renderDOM || null;
-            }
+            },
+            configurable: true
         }
     });
     Object.assign(component, {

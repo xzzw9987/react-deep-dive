@@ -2,11 +2,18 @@
  * Find differences between element
  * and then apply patch
  */
+
+/**
+ * @todo
+ * Remove ref when unmount node
+ */
+
 import flatten from './utils/flattenArray';
 import mount from './mount';
 import unmount from './unmount'
 import {REAL_DOM_KEY} from  './key' ;
 import setAttributes from './utils/setAttributes';
+import stripeProp from './utils/stripeProp';
 import trigger from './utils/trigger';
 
 const diff = (oldElement, newElement, containerDOM) => {
@@ -16,7 +23,7 @@ const diff = (oldElement, newElement, containerDOM) => {
         for (let i = 0; i < oldElement.length || i < newElement.length; i++) {
             diff(oldElement[i], newElement[i], containerDOM);
         }
-        return ;
+        return;
     }
 
     if (!oldElement && newElement) {
@@ -40,7 +47,7 @@ const diff = (oldElement, newElement, containerDOM) => {
         const fragment = document.createDocumentFragment();
         fragment[REAL_DOM_KEY] = containerDOM;
         mount(newElement, fragment);
-        console.log(containerDOM, oldElement.__renderDOM);
+        // console.log(containerDOM, oldElement.__renderDOM, fragment);
         containerDOM.replaceChild(fragment, oldElement.__renderDOM);
     }
     else {
@@ -49,19 +56,39 @@ const diff = (oldElement, newElement, containerDOM) => {
                 ...newElement.props,
                 children: newElement.children
             });
+
+            // Fix dom element attributes
+
+            const cloneNewElementsProps = stripeProp({...newElement.props}, ['ref', 'children']),
+                cloneOldElementsProps = stripeProp({...oldElement.props}, ['ref', 'children']),
+                concatKeys = [...Object.keys(cloneNewElementsProps), ...Object(cloneOldElementsProps)];
+
+            for (let key of concatKeys) {
+                if (cloneOldElementsProps[key] && !cloneNewElementsProps[key]) {
+                    oldElement.__renderDOM.removeAttribute(key);
+                }
+                else if (cloneOldElementsProps[key] !== cloneNewElementsProps[key]) {
+                    oldElement.__renderDOM.setAttribute(key, cloneNewElementsProps[key]);
+                }
+            }
+
             const renderElement = oldElement.__renderedComponent.render(),
                 lastRender = oldElement.__renderedComponent.__lastRender;
             for (let i = 0; i < renderElement.props.children.length || i < lastRender.props.children.length; i++) {
                 diff(lastRender.props.children[i], renderElement.props.children[i], oldElement.__renderDOM);
             }
-            /**
-             * @todo
-             */
-            // oldElement.__lastRender = renderElement;
+
+
+            // Copy old element's key to new Element
+            ['__renderedComponent', '__containerDOM', '__renderDOM']
+                .forEach(key => renderElement[key] = oldElement[key]);
+
+            oldElement.__renderedComponent.__lastRender = renderElement;
         }
         else if (oldElement.__renderedComponent) {
+
             /**
-             * Compare vdom
+             * Compare VDom
              */
             const renderedComponent = oldElement.__renderedComponent,
                 newProps = {
@@ -74,30 +101,57 @@ const diff = (oldElement, newElement, containerDOM) => {
                 renderedComponent.setProps && renderedComponent.setProps(newProps);
                 const rendererElement = renderedComponent.render(),
                     lastRender = renderedComponent.__lastRender;
+                // console.log(lastRender, rendererElement, 'lastrender');
                 diff(lastRender, rendererElement, renderedComponent.__containerDOM);
+
+                const __renderedComponent = rendererElement.__renderedComponent || lastRender.__renderedComponent,
+                    __renderDOM = rendererElement.__renderDOM || lastRender.__renderDOM;
+
+                Object.defineProperties(rendererElement, {
+                    __renderedComponent: {
+                        value: __renderedComponent,
+                        configurable: true
+                    },
+                    __containerDOM: {
+                        value: lastRender.__containerDOM,
+                        configurable: true
+                    },
+                    __renderDOM: {
+                        get(){
+                            return __renderDOM;
+                        },
+                        configurable: true
+                    }
+                });
+
+                Object.assign(renderedComponent, {
+                    __containerDOM: oldElement.__containerDOM,
+                    __lastRender: rendererElement
+                });
+
                 /**
                  * @todo
                  */
-                // trigger(renderedComponent, 'componentDidUpdate', newProps, renderedComponent.state);
+                trigger(renderedComponent, 'componentDidUpdate', newProps, renderedComponent.state);
             }
             else {
                 renderedComponent.setProps && renderedComponent.setProps(newProps);
             }
         }
-        else if (typeof oldElement.type === 'string') {
-            /**
-             * Compare real dom
-             */
-            console.log(oldElement);
-            const attrsNodes = oldElement.__renderDOM.attributes;
-            while (attrsNodes.length) {
-                oldElement.__renderDOM.removeAttributeNode(attrsNodes[0]);
-            }
-            setAttributes(oldElement.__renderDOM, newElement.props);
-            for (let i = 0; i < oldElement.children.length || i < newElement.children.length; i++) {
-                diff(oldElement.children[i], newElement.children[i], oldElement.__renderDOM);
-            }
-        }
+        // else if (typeof oldElement.type === 'string') {
+        //     /**
+        //      * Compare real dom
+        //      */
+        //     console.log(oldElement);
+        //     const attrsNodes = oldElement.__renderDOM.attributes;
+        //     while (attrsNodes.length) {
+        //         oldElement.__renderDOM.removeAttributeNode(attrsNodes[0]);
+        //     }
+        //     setAttributes(oldElement.__renderDOM, newElement.props);
+        //     for (let i = 0; i < oldElement.children.length || i < newElement.children.length; i++) {
+        //         diff(oldElement.children[i], newElement.children[i], oldElement.__renderDOM);
+        //     }
+        // }
     }
     return isChanged;
 };
