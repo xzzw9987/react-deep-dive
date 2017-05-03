@@ -26,7 +26,15 @@ class ComponentB extends Component {
         return (<ul>
                     {
                         Array.from(new Array(this.props.count))
-                             .map((v, i)=><li data-a={i} data-b={Math.random()}><ComponentC x={Math.random()}/></li>)
+                             .map((v, i)=>(
+                                 <li data-a={i} data-b={Math.random()}>
+                                     <div>
+                                         <ComponentC x={Math.random()}>
+                                             <div><ComponentC x={Math.random()}/></div>
+                                         </ComponentC>
+                                     </div>
+                                 </li>
+                             ))
                     }
                 </ul>)
     }
@@ -46,8 +54,7 @@ class ComponentC extends Component {
     }
 
     render() {
-        console.log(this.props.x);
-        return <span>{this.props.x}</span>
+        return <h3>{this.props.x},{this.props.children}</h3>
     }
 }
 
