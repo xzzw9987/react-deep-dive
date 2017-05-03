@@ -12,7 +12,7 @@ class ComponentA extends Component {
             count: 3
         };
         setInterval(() => {
-            this.setState({count: 1 + parseInt(5 * Math.random(), 10)});
+            this.setState({count: 1 + parseInt(4 * Math.random())});
         }, 1000);
     }
 
@@ -24,18 +24,30 @@ class ComponentA extends Component {
 class ComponentB extends Component {
     render() {
         return (<ul>
-            {
-                Array.from(new Array(this.props.count)).map((v, i) => (
-                    <li data-k={i} data-index={Math.random()}><div>{Math.random()}</div></li>
-                ))
-            }
-        </ul>)
+                    {
+                        Array.from(new Array(this.props.count))
+                             .map((v, i)=><li data-a={i} data-b={Math.random()}><ComponentC x={Math.random()}/></li>)
+                    }
+                </ul>)
     }
-    componentDidMount(){
-        console.log('mount');
+
+    componentDidMount() {
+      //  console.log('mount');
     }
+
+    componentWillUpdate() {
+       // console.log('xxx');
+    }
+}
+
+class ComponentC extends Component {
     componentWillUpdate(){
-        console.log('xxx');
+        // console.log('update');
+    }
+
+    render() {
+        console.log(this.props.x);
+        return <span>{this.props.x}</span>
     }
 }
 

@@ -51,6 +51,7 @@ const mountNativeElement = (element, dom) => {
         r = c.render();
 
     Object.assign(r, {
+        __renderedComponent: c,
         __containerDOM: getRealDOM(dom),
         __renderDOM: domElement
     });

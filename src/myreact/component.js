@@ -33,20 +33,20 @@ export default class {
                     const k = this.render();
                     diff(this.__lastRender, k, this.__containerDOM);
 
-                    const __renderComponent = k.__renderedComponent || this.__lastRender.__renderedComponent,
-                        __renderDOM = k.__renderDOM || this.__lastRender.__renderDOM,
-                        __containerDOM = this.__lastRender.__containerDOM;
-
-                    Object.defineProperties(k, {
-                        __renderedComponent: {value: __renderComponent, configurable: true},
-                        __containerDOM: {value: __containerDOM, configurable: true},
-                        __renderDOM: {
-                            get(){
-                                return __renderDOM
-                            }, configurable: true
-                        }
-                    });
-                    this.__lastRender = k;
+                    // const __renderComponent = k.__renderedComponent || this.__lastRender.__renderedComponent,
+                    //     __renderDOM = k.__renderDOM || this.__lastRender.__renderDOM,
+                    //     __containerDOM = this.__lastRender.__containerDOM;
+                    //
+                    // Object.defineProperties(k, {
+                    //     __renderedComponent: {value: __renderComponent, configurable: true},
+                    //     __containerDOM: {value: __containerDOM, configurable: true},
+                    //     __renderDOM: {
+                    //         get(){
+                    //             return __renderDOM
+                    //         }, configurable: true
+                    //     }
+                    // });
+                    // this.__lastRender = k;
                     this.__status = COMPONENT_STATE.IDLE;
                     /**
                      * @todo

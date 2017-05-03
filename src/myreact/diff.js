@@ -76,8 +76,8 @@ const diff = (oldElement, newElement, containerDOM) => {
 
             const renderElement = oldElement.__renderedComponent.render(),
                 lastRender = oldElement.__renderedComponent.__lastRender;
-            for (let i = 0; i < renderElement.props.children.length || i < lastRender.props.children.length; i++) {
-                diff(lastRender.props.children[i], renderElement.props.children[i], oldElement.__renderDOM);
+            for (let i = 0; i < renderElement.children.length || i < lastRender.children.length; i++) {
+                diff(lastRender.children[i], renderElement.children[i], oldElement.__renderDOM);
             }
 
 
@@ -85,7 +85,7 @@ const diff = (oldElement, newElement, containerDOM) => {
             ['__renderedComponent', '__containerDOM', '__renderDOM']
                 .forEach(key => newElement[key] = oldElement[key]);
 
-            newElement.__renderedComponent.__lastRender = renderElement;
+            newElement.__renderedComponent.__lastRender = newElement;
         }
         else if (oldElement.__renderedComponent) {
 
@@ -106,25 +106,23 @@ const diff = (oldElement, newElement, containerDOM) => {
                 // console.log(lastRender, rendererElement, 'lastrender');
                 diff(lastRender, rendererElement, renderedComponent.__containerDOM);
 
-                const __renderedComponent = rendererElement.__renderedComponent || lastRender.__renderedComponent,
-                    __renderDOM = rendererElement.__renderDOM || lastRender.__renderDOM;
+                const __renderDOM = rendererElement.__renderDOM || lastRender.__renderDOM;
 
-                Object.defineProperties(rendererElement, {
+                Object.defineProperties(newElement, {
                     __renderedComponent: {
-                        value: __renderedComponent,
+                        value: oldElement.__renderedComponent,
                         configurable: true
                     },
                     __containerDOM: {
-                        value: lastRender.__containerDOM,
+                        value: oldElement.__containerDOM,
                         configurable: true
                     },
                     __renderDOM: {
-                        get(){
-                            return __renderDOM;
-                        },
+                        get(){return __renderDOM},
                         configurable: true
                     }
                 });
+
 
                 Object.assign(renderedComponent, {
                     __containerDOM: oldElement.__containerDOM,
