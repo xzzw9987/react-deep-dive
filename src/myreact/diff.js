@@ -28,10 +28,12 @@ const diff = (oldElement, newElement, containerDOM) => {
 
     if (!oldElement && newElement) {
         mount(newElement, containerDOM);
+        // console.log('mount', newElement);
         return;
     }
     if (oldElement && !newElement) {
         unmount(oldElement, containerDOM);
+        // console.log('unmount', oldElement);
         containerDOM.removeChild(oldElement.__renderDOM);
         return;
     }
@@ -81,9 +83,9 @@ const diff = (oldElement, newElement, containerDOM) => {
 
             // Copy old element's key to new Element
             ['__renderedComponent', '__containerDOM', '__renderDOM']
-                .forEach(key => renderElement[key] = oldElement[key]);
+                .forEach(key => newElement[key] = oldElement[key]);
 
-            oldElement.__renderedComponent.__lastRender = renderElement;
+            newElement.__renderedComponent.__lastRender = renderElement;
         }
         else if (oldElement.__renderedComponent) {
 
