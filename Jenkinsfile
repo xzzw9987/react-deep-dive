@@ -4,6 +4,7 @@ pipeline {
     stage('test') {
       steps {
         input 'Hello, put some message'
+        sh 'ls && pwd'
       }
     }
   }
