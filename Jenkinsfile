@@ -10,11 +10,6 @@ pipeline {
         input 'Hello, put some message'
         sh 'node -v'
         sh 'ls && pwd'
-        waitUntil() {
-          sh 'echo "a"'
-          return true;
-        }
-        
       }
     }
   }
