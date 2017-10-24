@@ -12,6 +12,7 @@ pipeline {
         sh 'ls && pwd'
         waitUntil() {
           sh 'echo "a"'
+          return true
         }
         
       }
