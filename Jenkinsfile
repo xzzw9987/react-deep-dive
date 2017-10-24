@@ -5,6 +5,10 @@ pipeline {
       steps {
         input 'Hello, put some message'
         sh 'ls && pwd'
+        waitUntil() {
+          sh 'echo "a"'
+        }
+        
       }
     }
   }
